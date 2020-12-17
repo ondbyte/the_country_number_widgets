@@ -2,7 +2,7 @@
 # the_country_number_widgets
 A small widgets library for flutter based on *[the_country_number](https://github.com/ondbyte/the_country_number)*
 
-A simple form-field for international phone number input
+A simple form-field for international phone number input with realtime validation
 ```dart
 //with prefilled number
 final currentNumber = TheCountryNumber().parse(internationalNumber:"+97156565656");
@@ -25,6 +25,25 @@ TheCountryNumberInput(
       //do something
     }
   }, 
+)
+```
+with your own validation when `FormState.validate()` is called
+```dart
+final numberWithOnlyPrefix = currentNumber.removeNumber();
+TheCountryNumberInput(
+  numberWithOnlyPrefix,
+  onChanged: (tn) {
+    _enteredNumber = tn;
+    if(_enteredNumber.isValidLength){
+      //do something
+    }
+  },
+  customValidator: (tn) {
+    if(tn.isValidLength){
+      return null;
+    }
+    return "Enter a valid number";
+  }
 )
 ```
 *keep in mind that some countries support phone numbers of multiple lengths, which is supported too*
