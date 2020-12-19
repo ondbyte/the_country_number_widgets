@@ -12,9 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  the_country_number:
-    git:
-      url: https://github.com/ondbyte/the_country_number.git
+  the_country_number: 0.9.0
 
 dev_dependencies:
   flutter_test:
