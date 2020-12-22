@@ -9,6 +9,8 @@
 .history
 .svn/
 pubspec.lock
+.fvm/
+.dart_tool/
 
 # IntelliJ related
 *.iml
