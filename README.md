@@ -20,6 +20,10 @@ final numberWithOnlyPrefix = currentNumber.removeNumber();
 TheCountryNumberInput(
   numberWithOnlyPrefix,
   onChanged: (tn) {
+   //even you can check whether its correctly parsed, not needed but library is not even 1.0
+    if(tn.isNotANumber()){
+     return;
+    }
     _enteredNumber = tn;
     if(_enteredNumber.isValidLength){
       //do something

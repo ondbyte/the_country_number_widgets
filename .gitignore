@@ -11,6 +11,9 @@
 pubspec.lock
 .fvm/
 .dart_tool/
+example/.dart_tool/
+example/build
+example/.idea
 
 # IntelliJ related
 *.iml

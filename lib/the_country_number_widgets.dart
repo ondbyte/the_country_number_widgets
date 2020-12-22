@@ -3,13 +3,15 @@ library the_country_number_widgets;
 import 'package:flutter/material.dart';
 import 'package:the_country_number/the_country_number.dart';
 
+export 'package:the_country_number/the_country_number.dart';
+
 ///A FormField that lets you select dial-code prefix of a Country and validate the length of the entered number
 class TheCountryNumberInput extends StatefulWidget {
   ///The initial [TheNumber] with or without the number component
   final TheNumber existingCountryNumber;
 
   ///Lets you override the validation of the [TheNumber] entered when [FormState.validate] is called
-  final Function(TheNumber?)? customValidator;
+  final Function(TheNumber)? customValidator;
 
   ///Custom decoration of the field, pass a [TheInputDecor] object
   final TheInputDecor decoration;
@@ -18,7 +20,7 @@ class TheCountryNumberInput extends StatefulWidget {
   final bool showDialCode;
 
   ///Updates to the entered number
-  final Function(TheNumber?)? onChanged;
+  final Function(TheNumber)? onChanged;
 
   ///A FormField that lets you select dial-code prefix of a Country and validate the length of the entered number
   const TheCountryNumberInput(
@@ -38,6 +40,8 @@ class _TheCountryNumberInputState extends State<TheCountryNumberInput> {
   final _controller = TextEditingController();
   @override
   void initState() {
+    assert(!widget.existingCountryNumber.isNotANumber(),
+        "passed existingCountryNumber is notANumber");
     _selectedNumber = widget.existingCountryNumber;
     _controller.text = _selectedNumber?.number ?? "";
     super.initState();
@@ -54,7 +58,7 @@ class _TheCountryNumberInputState extends State<TheCountryNumberInput> {
               setState(
                 () {
                   _selectedNumber = TheCountryNumber()
-                      .parseNumber(iso2Code: tn.iso2)!
+                      .parseNumber(iso2Code: tn.iso2)
                       .addNumber(_controller.text)!;
                 },
               );
@@ -76,14 +80,16 @@ class _TheCountryNumberInputState extends State<TheCountryNumberInput> {
             ),
             validator: (s) {
               return widget.customValidator!(
-                _selectedNumber,
+                _selectedNumber ?? widget.existingCountryNumber,
               );
             },
             onChanged: (s) {
               _selectedNumber = TheCountryNumber().parseNumber(
                   internationalNumber: _selectedNumber?.dialCode ?? "" + s);
               if (_selectedNumber != null) {
-                widget.onChanged!(_selectedNumber);
+                widget.onChanged!(
+                  _selectedNumber ?? widget.existingCountryNumber,
+                );
               }
             },
           ),
@@ -262,7 +268,7 @@ class TheSearchResultSliver extends StatelessWidget {
           return TheCountryTile(
             country: countries[i],
             onTap: () {
-              Navigator.of(context).pop(countries[i]);
+              Navigator.of(context)?.pop(countries[i]);
             },
           );
         },
@@ -271,10 +277,12 @@ class TheSearchResultSliver extends StatelessWidget {
     );
   }
 }
+
 ///A [ListTile] showing the details of the vitals in [TheCountry] that is passed
 class TheCountryTile extends StatelessWidget {
   ///[TheCountry] that this tile depends on
   final TheCountry country;
+
   ///Feed back when this tile is tapped
   final Function? onTap;
 
@@ -294,16 +302,21 @@ class TheCountryTile extends StatelessWidget {
     );
   }
 }
+
 ///The decorator class for the [TheCountryNumberInput]
 class TheInputDecor {
   ///See [InputDecoration.fillColor]
   final Color? fillColor;
+
   ///See [InputDecoration.labelText] and [InputDecoration.hintText]
   final String? labelText, hintText;
+
   ///See [InputDecoration.border]
   final InputBorder? border;
+
   ///See [InputDecoration.labelStyle]
   final TextStyle? labelStyle;
+
   ///The [BorderRadius] of the prefix flag
   final BorderRadius? prefixBorderRadius;
 
