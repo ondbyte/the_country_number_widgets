@@ -1,3 +1,7 @@
-## [0.0.1] - TODO: Add release date.
+## [0.9.0] - 20-12-2020 (dd-mm-yyyy)
 
-* TODO: Describe initial release.
+* First release without null safety.
+
+## [0.9.1] - 22-12-2020 (dd-mm-yyyy)
+
+* Now with null safety and added documentation

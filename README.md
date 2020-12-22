@@ -1,7 +1,7 @@
 ![header](https://i.imgur.com/xiil4Wj.jpg)
 # the_country_number_widgets
-A small widgets library for flutter based on *[the_country_number](https://github.com/ondbyte/the_country_number)*
-
+A small widgets library for flutter based on *[the_country_number](https://github.com/ondbyte/the_country_number)* which doesn't depend on libphonenumber, only pure dart.
+*If you need skip null safety, please use 0.9.0*
 A simple form-field for international phone number input with realtime validation
 ```dart
 //with prefilled number

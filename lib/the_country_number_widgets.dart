@@ -3,34 +3,43 @@ library the_country_number_widgets;
 import 'package:flutter/material.dart';
 import 'package:the_country_number/the_country_number.dart';
 
+///A FormField that lets you select dial-code prefix of a Country and validate the length of the entered number
 class TheCountryNumberInput extends StatefulWidget {
+  ///The initial [TheNumber] with or without the number component
   final TheNumber existingCountryNumber;
-  final Function(TheNumber) customValidator;
-  final TheInputDecor decoration;
-  final bool showDialCode;
-  final Function(TheNumber) onChanged;
 
+  ///Lets you override the validation of the [TheNumber] entered when [FormState.validate] is called
+  final Function(TheNumber?)? customValidator;
+
+  ///Custom decoration of the field, pass a [TheInputDecor] object
+  final TheInputDecor decoration;
+
+  ///Should the dial-code prefix be visible
+  final bool showDialCode;
+
+  ///Updates to the entered number
+  final Function(TheNumber?)? onChanged;
+
+  ///A FormField that lets you select dial-code prefix of a Country and validate the length of the entered number
   const TheCountryNumberInput(
-      this.existingCountryNumber, {
-        Key key,
-        this.customValidator,
-        this.decoration = const TheInputDecor(),
-        this.showDialCode = true,
-        this.onChanged,
-      }) : super(key: key);
+    this.existingCountryNumber, {
+    Key? key,
+    this.customValidator,
+    this.decoration = const TheInputDecor(),
+    this.showDialCode = true,
+    this.onChanged,
+  }) : super(key: key);
   @override
   _TheCountryNumberInputState createState() => _TheCountryNumberInputState();
 }
 
 class _TheCountryNumberInputState extends State<TheCountryNumberInput> {
-  TheNumber _selectedNumber;
+  TheNumber? _selectedNumber;
   final _controller = TextEditingController();
   @override
   void initState() {
-    assert(widget.existingCountryNumber != null,
-    "Initializing number cannot be null");
     _selectedNumber = widget.existingCountryNumber;
-    _controller.text = _selectedNumber.number;
+    _controller.text = _selectedNumber?.number ?? "";
     super.initState();
   }
 
@@ -42,17 +51,18 @@ class _TheCountryNumberInputState extends State<TheCountryNumberInput> {
           existingCountryNumber: _selectedNumber,
           onNewCountrySelected: (tn) {
             if (tn != null) {
-              setState(() {
-                _selectedNumber = TheCountryNumber()
-                    .parseNumber(iso2Code: tn.iso2)
-                    .addNumber(_controller.text);
-              });
+              setState(
+                () {
+                  _selectedNumber = TheCountryNumber()
+                      .parseNumber(iso2Code: tn.iso2)!
+                      .addNumber(_controller.text)!;
+                },
+              );
             }
           },
         ),
         Expanded(
           child: TextFormField(
-
             controller: _controller,
             decoration: InputDecoration(
               fillColor: widget.decoration.fillColor,
@@ -60,19 +70,20 @@ class _TheCountryNumberInputState extends State<TheCountryNumberInput> {
               border: widget.decoration.border,
               hintText: widget.decoration.hintText,
               labelStyle: widget.decoration.labelStyle,
-              prefix:
-              widget.showDialCode ? Text(_selectedNumber.dialCode) : null,
+              prefix: widget.showDialCode
+                  ? Text(_selectedNumber?.dialCode ?? "")
+                  : null,
             ),
             validator: (s) {
-              return widget.customValidator(
+              return widget.customValidator!(
                 _selectedNumber,
               );
             },
             onChanged: (s) {
               _selectedNumber = TheCountryNumber().parseNumber(
-                  internationalNumber: _selectedNumber.dialCode + s);
-              if(_selectedNumber!=null){
-                widget.onChanged(_selectedNumber);
+                  internationalNumber: _selectedNumber?.dialCode ?? "" + s);
+              if (_selectedNumber != null) {
+                widget.onChanged!(_selectedNumber);
               }
             },
           ),
@@ -82,20 +93,31 @@ class _TheCountryNumberInputState extends State<TheCountryNumberInput> {
   }
 }
 
+///The flag prefix which lets you select Country
 class ThePrefix extends StatelessWidget {
-  final BorderRadius borderRadius;
-  final TheNumber existingCountryNumber;
-  final EdgeInsets padding;
-  final double width;
-  final Function(TheCountry) onNewCountrySelected;
+  /// The border radius of the flag icon
+  final BorderRadius? borderRadius;
 
+  ///Initial Country flag
+  final TheNumber? existingCountryNumber;
+
+  ///The padding of the icon
+  final EdgeInsets? padding;
+
+  ///The custom width of the Flag, defaults to 32
+  final double width;
+
+  ///Updates on Country is changed
+  final Function(TheCountry?) onNewCountrySelected;
+
+  ///The flag prefix which lets you select Country
   const ThePrefix(
-      {Key key,
-        this.borderRadius,
-        this.existingCountryNumber,
-        this.padding,
-        this.width = 32,
-        this.onNewCountrySelected})
+      {Key? key,
+      this.borderRadius,
+      this.existingCountryNumber,
+      this.padding,
+      this.width = 32,
+      required this.onNewCountrySelected})
       : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -119,9 +141,12 @@ class ThePrefix extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: padding ?? const EdgeInsets.only(left: 0,),
+            padding: padding ??
+                const EdgeInsets.only(
+                  left: 0,
+                ),
             child: TheCountryFlag(
-              iso2: existingCountryNumber.country.iso2,
+              iso2: existingCountryNumber?.country.iso2 ?? "IN",
             ),
           ),
           const Icon(Icons.arrow_drop_down),
@@ -131,11 +156,20 @@ class ThePrefix extends StatelessWidget {
   }
 }
 
+///Icon with a Flag
 class TheCountryFlag extends StatelessWidget {
+  ///the iso2 code of the Country of the flag to be showed
   final String iso2;
+
+  ///Custom width of the Flag icon, defaults to 32
   final double width;
-  final BorderRadius borderRadius;
-  const TheCountryFlag({Key key, this.iso2, this.width = 32, this.borderRadius})
+
+  ///Custom border radius of the Flag icon, defaults to 2
+  final BorderRadius? borderRadius;
+
+  ///Icon with a Flag
+  const TheCountryFlag(
+      {Key? key, required this.iso2, this.width = 32, this.borderRadius})
       : super(key: key);
 
   @override
@@ -153,10 +187,14 @@ class TheCountryFlag extends StatelessWidget {
   }
 }
 
+///A [ListView] Widget showing all the [TheCountry] passed as a [List]
 class TheCountryPickerList extends StatefulWidget {
+  ///All the countries to show in the [ListView]
   final List<TheCountry> countries;
 
-  const TheCountryPickerList({Key key, this.countries}) : super(key: key);
+  ///A [ListView] Widget showing all the [TheCountry] passed as a [List]
+  const TheCountryPickerList({Key? key, required this.countries})
+      : super(key: key);
   @override
   _TheCountryPickerListState createState() => _TheCountryPickerListState();
 }
@@ -204,21 +242,23 @@ class _TheCountryPickerListState extends State<TheCountryPickerList> {
     }
     return widget.countries
         .where((element) => element.englishName
-        .toLowerCase()
-        .startsWith(_term.trim().toLowerCase()))
+            .toLowerCase()
+            .startsWith(_term.trim().toLowerCase()))
         .toList();
   }
 }
 
+///A [ListView] showing the results of th [TheCountry] search
 class TheSearchResultSliver extends StatelessWidget {
   final List<TheCountry> countries;
 
-  const TheSearchResultSliver({Key key, this.countries}) : super(key: key);
+  const TheSearchResultSliver({Key? key, required this.countries})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return SliverList(
       delegate: SliverChildBuilderDelegate(
-            (_, i) {
+        (_, i) {
           return TheCountryTile(
             country: countries[i],
             onTap: () {
@@ -231,16 +271,21 @@ class TheSearchResultSliver extends StatelessWidget {
     );
   }
 }
-
+///A [ListTile] showing the details of the vitals in [TheCountry] that is passed
 class TheCountryTile extends StatelessWidget {
+  ///[TheCountry] that this tile depends on
   final TheCountry country;
-  final Function onTap;
+  ///Feed back when this tile is tapped
+  final Function? onTap;
 
-  const TheCountryTile({Key key, this.country, this.onTap}) : super(key: key);
+  const TheCountryTile({Key? key, required this.country, this.onTap})
+      : super(key: key);
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      onTap: onTap,
+      onTap: () {
+        onTap!();
+      },
       leading: TheCountryFlag(
         iso2: country.iso2,
       ),
@@ -249,14 +294,20 @@ class TheCountryTile extends StatelessWidget {
     );
   }
 }
-
+///The decorator class for the [TheCountryNumberInput]
 class TheInputDecor {
-  final Color fillColor;
-  final String labelText, hintText;
-  final InputBorder border;
-  final TextStyle labelStyle;
-  final BorderRadius prefixBorderRadius;
+  ///See [InputDecoration.fillColor]
+  final Color? fillColor;
+  ///See [InputDecoration.labelText] and [InputDecoration.hintText]
+  final String? labelText, hintText;
+  ///See [InputDecoration.border]
+  final InputBorder? border;
+  ///See [InputDecoration.labelStyle]
+  final TextStyle? labelStyle;
+  ///The [BorderRadius] of the prefix flag
+  final BorderRadius? prefixBorderRadius;
 
+  ///The decorator class for the [TheCountryNumberInput]
   const TheInputDecor({
     this.prefixBorderRadius,
     this.fillColor,
