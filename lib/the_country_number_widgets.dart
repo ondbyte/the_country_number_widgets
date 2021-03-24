@@ -268,7 +268,7 @@ class TheSearchResultSliver extends StatelessWidget {
           return TheCountryTile(
             country: countries[i],
             onTap: () {
-              Navigator.of(context)?.pop(countries[i]);
+              Navigator.of(context).pop(countries[i]);
             },
           );
         },
